@@ -46,6 +46,8 @@ INSTALLED_APPS = (
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.google',
     'djrill'
 )
 
@@ -65,7 +67,7 @@ MIDDLEWARE_CLASSES = (
 AUTHENTICATION_BACKENDS = (
     #'django.contrib.auth.backends.ModelBackend',
     'establishmentDataManagement.authorization.MultipleDBAuthorization',
-    # 'allauth.account.auth_backends.AuthenticationBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
 AUTH_USER_MODEL = "witbooking_auth.WitbookingUser"
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
