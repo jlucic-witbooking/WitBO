@@ -74,6 +74,7 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
+SOCIALACCOUNT_EMAIL_REQUIRED = False
 
 ROOT_URLCONF = 'WitbookingBackoffice.urls'
 
@@ -132,6 +133,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 LOGIN_REDIRECT_URL = '/admin'
+LOGIN_URL = "/accounts/login/"
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
@@ -146,6 +148,7 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates', 'admin')
 )
 
+GRAPPELLI_ADMIN_TITLE = 'Admin Witbooking'
 GRAPPELLI_INDEX_DASHBOARD = {
       'django.contrib.admin.site': 'establishmentDataManagement.dashboard.CustomIndexDashboard',
       'establishmentDataManagement.admin.admin_site': 'establishmentDataManagement.dashboard.CustomIndexDashboard'
