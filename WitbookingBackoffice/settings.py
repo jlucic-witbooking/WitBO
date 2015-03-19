@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'bootstrap3',
+    'accounting',
     'establishmentDataManagement',
     'witbooking_auth',
     'allauth',

@@ -7,13 +7,14 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, UserManager, Permission
 from django.utils.translation import ugettext_lazy as _
+from accounting.models import Establishment
 
 __author__ = 'mongoose'
 
 @python_2_unicode_compatible
 class WitbookingPermission(Permission):
     pid = models.AutoField(primary_key=True)
-    establishment = models.CharField(_('establishment'), max_length=255)
+    establishment = models.ForeignKey('accounting.Establishment')
 
     def __str__(self):
         return "%s | %s | %s" % (
@@ -21,13 +22,35 @@ class WitbookingPermission(Permission):
             six.text_type(self.content_type),
             six.text_type(self.name))
 
+
+class Role(models.Model):
+    name = models.CharField(_('role'), max_length=255)
+    permissions = models.ManyToManyField(
+        Permission,
+        verbose_name=_('roles'),
+        blank=True, help_text=_('The authorization role a user has. A user will '
+                                'get all permissions granted to each of '
+                                'his/her role.'),
+    )
+
+
+class RoleWithHotel(models.Model):
+    role = models.ForeignKey(Role)
+    user = models.ForeignKey('WitbookingUser', null=True)
+    user_group = models.ForeignKey('UserGroups', null=True)
+    establishment = models.ForeignKey('accounting.Establishment')
+
+
 class WitbookingPermissionsMixin(models.Model):
     """
+    IMPORTANT
+    WHY THIS CLASS?
+    We cannot subclass the mixing and override it as normal Python would
+    allow, instead we copy the whole class :(
+
     A mixin class that adds the fields and methods necessary to support
     Django's Group and Permission model using the ModelBackend.
 
-    We cannot subclass the mixing and override it as normal Python would
-    allow, instead we copy the whole class :(
     """
 
     is_superuser = models.BooleanField(
@@ -51,6 +74,13 @@ class WitbookingPermissionsMixin(models.Model):
         verbose_name=_('user permissions'), blank=True,
         help_text=_('Specific permissions for this user.'),
         related_name="user_set", related_query_name="user"
+    )
+
+    roles_with_hotel = models.ManyToManyField(
+        Role,
+        verbose_name=_('User roles to hotels'), blank=True,
+        help_text=_('Specific roles for this user for specific hotels.'),
+        through='RoleWithHotel'
     )
 
     class Meta:
@@ -151,3 +181,31 @@ class WitbookingUser(AbstractBaseUser, WitbookingPermissionsMixin):
         abstract = False
         swappable = 'AUTH_USER_MODEL'
         app_label = 'witbooking_auth'
+
+
+class EstablishmentGroup(models.Model):
+    name = models.CharField(_('establishment'), max_length=255)
+    establishments = models.ManyToManyField('accounting.Establishment')
+
+    def __unicode__(self):
+        return u'%s' % self.name
+
+
+class UserGroups(models.Model):
+    name = models.CharField(_('user_groups'), max_length=255)
+    witbooking_users = models.ManyToManyField(
+        WitbookingUser,
+        verbose_name=_('users'),
+        blank=True
+    )
+    group_permissions = models.ManyToManyField(
+        WitbookingPermission,
+        verbose_name=_('Group permissions'), blank=True,
+        help_text=_('Specific permissions for this group.'),
+    )
+    roles_with_hotel = models.ManyToManyField(
+        Role,
+        verbose_name=_('Group roles to hotels'), blank=True,
+        help_text=_('Specific roles for this group for specific hotels.'),
+        through='RoleWithHotel'
+    )

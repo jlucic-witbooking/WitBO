@@ -1,17 +1,21 @@
 from django.contrib import admin
 from django.contrib.admin import AdminSite
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.models import Group
 from django.core.urlresolvers import reverse, NoReverseMatch
+from django.db import models
 from django.template.response import TemplateResponse
 from django.utils.text import capfirst
 from django.views.decorators.cache import never_cache
 from django.apps import apps
 from django.utils import six
-from establishmentDataManagement.forms import DemoUserAdminForm, WitbookingUserCreationForm
+from establishmentDataManagement.forms import WitbookingUserChangeForm, WitbookingUserCreationForm
 from establishmentDataManagement.models import Users
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.admin import UserAdmin
-from witbooking_auth.models import WitbookingUser, WitbookingPermission
+from witbooking_auth.models import WitbookingUser, WitbookingPermission, EstablishmentGroup, RoleWithHotel
+
 
 class MyAdminSite(AdminSite):
     @never_cache
@@ -114,11 +118,18 @@ class WitbookingUserAdmin(UserAdmin):
     search_fields = ('first_name', 'last_name', 'display_name', 'email')
     ordering = ('email',)
     list_filter = ('is_admin', 'is_superuser', 'is_active', 'groups')
-    form = DemoUserAdminForm
+    form = WitbookingUserChangeForm
     add_form = WitbookingUserCreationForm
 
 
 class UsersAdmin(admin.ModelAdmin):
+    pass
+
+
+class EstablishmentGroupAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': FilteredSelectMultiple("Groups", is_stacked=False) },
+    }
     pass
 
 
@@ -129,3 +140,7 @@ admin.site.register(WitbookingUser, WitbookingUserAdmin)
 admin.site.register(WitbookingPermission)
 
 admin_site.register(Users, UsersAdmin)
+
+admin.site.register(EstablishmentGroup, EstablishmentGroupAdmin)
+
+admin.site.register(RoleWithHotel)

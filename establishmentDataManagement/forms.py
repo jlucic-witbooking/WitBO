@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from establishmentDataManagement.utils import user_exists
 from django.utils.translation import ugettext_lazy as _
-from witbooking_auth.models import WitbookingUser
+from witbooking_auth.models import WitbookingUser, EstablishmentGroup
 
 
 class WitbookingUserCreationForm(UserCreationForm):
@@ -31,12 +31,13 @@ class WitbookingUserCreationForm(UserCreationForm):
         self.instance.username = self.instance.email
         return super(WitbookingUserCreationForm, self).save(commit=commit)
 
-class DemoUserAdminForm(forms.ModelForm):
+
+class WitbookingUserChangeForm(forms.ModelForm):
+    temp_id = forms.ModelMultipleChoiceField(queryset=EstablishmentGroup.objects.all())
 
     class Meta:
         model = WitbookingUser
-        fields = ('email', 'is_admin', 'is_active', 'date_joined')
+        fields = '__all__'
 
     def is_valid(self):
-        #log.info(force_text(self.errors))
-        return super(DemoUserAdminForm, self).is_valid()
+        return super(WitbookingUserChangeForm, self).is_valid()
