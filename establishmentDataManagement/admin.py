@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import Group
+from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.template.response import TemplateResponse
@@ -14,7 +14,8 @@ from establishmentDataManagement.forms import WitbookingUserChangeForm, Witbooki
 from establishmentDataManagement.models import Users
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.admin import UserAdmin
-from witbooking_auth.models import WitbookingUser, WitbookingPermission, EstablishmentGroup, RoleWithHotel
+from witbooking_auth.models import WitbookingUser, WitbookingPermission, EstablishmentGroup, RoleWithHotel, Role, \
+    UserGroups
 
 
 class MyAdminSite(AdminSite):
@@ -126,21 +127,22 @@ class UsersAdmin(admin.ModelAdmin):
     pass
 
 
-class EstablishmentGroupAdmin(admin.ModelAdmin):
+class FilteredSelectMultipleManyToManyAdmin(admin.ModelAdmin):
     formfield_overrides = {
-        models.ManyToManyField: {'widget': FilteredSelectMultiple("Groups", is_stacked=False) },
+        models.ManyToManyField: {'widget': FilteredSelectMultiple("Groups", is_stacked=False)},
     }
     pass
 
 
-admin.site.register(Users, UsersAdmin)
 
 admin.site.register(WitbookingUser, WitbookingUserAdmin)
+admin.site.register(UserGroups, FilteredSelectMultipleManyToManyAdmin)
 
+admin.site.register(EstablishmentGroup, FilteredSelectMultipleManyToManyAdmin)
+admin.site.register(Role, FilteredSelectMultipleManyToManyAdmin)
+admin.site.register(RoleWithHotel, FilteredSelectMultipleManyToManyAdmin)
 admin.site.register(WitbookingPermission)
 
-admin_site.register(Users, UsersAdmin)
+admin.site.unregister(Group)
+admin.site.unregister(Site)
 
-admin.site.register(EstablishmentGroup, EstablishmentGroupAdmin)
-
-admin.site.register(RoleWithHotel)

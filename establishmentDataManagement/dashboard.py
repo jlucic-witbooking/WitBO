@@ -23,16 +23,10 @@ class CustomIndexDashboard(Dashboard):
         
         # append an app list module for "Applications"
         self.children.append(modules.AppList(
-            _('AppList: Applications'),
+            _('Applications'),
             collapsible=True,
             column=1,
-            exclude=('django.contrib.*',),
-        ))
-        self.children.append(modules.AppList(
-            title=_('Administration'),
-            column=1,
-            collapsible=True,
-            models=('django.contrib.*',),
+            exclude=('django.contrib.*','allauth.*'),
         ))
         # append a recent actions module
         self.children.append(modules.RecentActions(

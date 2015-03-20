@@ -8,7 +8,7 @@ class ServiceAdmin(admin.ModelAdmin):
 
 
 class EstablishmentAdmin(admin.ModelAdmin):
-    list_display = ('aplicacion', 'identificador', 'alta')
+    list_display = ('identificador', 'alta')
 
 
 class ContractAdmin(admin.ModelAdmin):
